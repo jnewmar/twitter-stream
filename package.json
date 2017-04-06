@@ -2,8 +2,9 @@
   "name": "twitter-stream",
   "version": "1.0.0",
   "description": "Twitter stream simulator server and client",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "server": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,4 +17,11 @@
     "url": "https://github.com/thormartin91/twitter-stream/issues"
   },
   "homepage": "https://github.com/thormartin91/twitter-stream#readme",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "nanotimer": "^0.3.14",
+    "process": "^0.11.9",
+    "readline": "^1.3.0",
+    "socket.io": "^1.7.3"
+  }
 }
