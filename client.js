@@ -1,16 +1,25 @@
 // CLIENT
 
-const io = require('socket.io-client');
-const socket = io('http://localhost:3000');
+const net = require('net');
+const socket = net.Socket();
+
+socket.connect(9999, '127.0.0.1', function() {
+	console.log('Connected');
+});
 
 var counter = 0;
 var start = new Date();
 
-socket.on('tweet', function(data){
-	counter += data.length;
+socket.on('data', function(data){
+	var items = data.toString().split('\r\n');
+	while (items.indexOf('') !== -1) {
+		items.splice(items.indexOf(''), 1);
+	}
+	counter += items.length;
+	console.log(items);
 });
 
-socket.on('stop', function(data){
+socket.on('end', function(data){
 	var end = new Date() - start;
 	console.info('Execution-time: \t', end, 'ms ~', (end/1000).toFixed(1), 's');
 	console.log('Recieved-count: \t', counter);

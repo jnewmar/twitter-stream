@@ -1,10 +1,10 @@
 // SERVER
 
-const io = require('socket.io')();
 const nanoTimer = require('nanotimer');
 const readline = require('readline');
 const fs = require('fs');
 const process = require('process');
+const net = require('net');
 
 // CONFIG
 const TPS = 5000; // int
@@ -12,6 +12,7 @@ const REPEAT = false; // true | false
 const CUTOFF = null; // int | null
 const BUFFER_THRESHOLD = 10; // int
 const DATAFILE = 'sample.txt';
+const PORT = 9999;
 
 var counter = 0;
 var timer = new nanoTimer();
@@ -54,7 +55,7 @@ function createNewInputStream() {
 
 createNewInputStream();
 
-io.sockets.on('connection', function (socket) {
+let server = net.createServer(function(socket){
 	console.log('\nClient connected - starting stream');
 	console.log('Start-memory: \t', (process.memoryUsage().rss/(1024*1024)).toFixed(1), 'MB');
 	startTime = new Date();
@@ -63,32 +64,36 @@ io.sockets.on('connection', function (socket) {
 
 	timer.setInterval(function() {
 		if (buffer.length < TPS && endOfFile) {
-			emit(buffer); // emit rest of buffer
-			stop();
+			emit(socket, buffer); // emit rest of buffer
+			setTimeout(function() { // give the socket time to write before closing
+				stop(socket);
+			}, 100);
 		} else {
 			if (buffer.length < (TPS*BUFFER_THRESHOLD) && !endOfFile) {
 				stream.resume();
 				process.stdout.write("#");
 			}
-			emit(buffer.splice(0,TPS));
+			emit(socket, buffer.splice(0,TPS));
 		}
 	}, [timer], '1s');
 
-
 });
 
-function emit(data) {
+function emit(socket, data) {
 	if (CUTOFF && counter >= CUTOFF) {
-		stop();
+		stop(socket);
 	} else {
-		io.sockets.emit('tweet', data);
-		counter += data.length;
+		for (index in data) {
+			socket.write(data[index] + '\r\n', function(){
+				counter++;
+			});
+		}
 	}
 }
 
-function stop() {
+function stop(socket) {
 	timer.clearInterval();
-	io.sockets.emit('stop', counter);
+	socket.destroy()
 	stream.close();
 	var endTime = new Date() - startTime;
 	console.log("\n|");
@@ -98,4 +103,4 @@ function stop() {
 	console.log('Frequency: \t', (counter/(endTime/1000)).toFixed(0), 't/s')
 }
 
-io.listen(3000);
+server.listen(PORT, 'localhost');
