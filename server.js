@@ -77,6 +77,17 @@ let server = net.createServer(function(socket){
 		}
 	}, [timer], '1s');
 
+	process.on('SIGINT', function() {
+		console.log('\n\n* Signal interrupt detected *');
+    stop(socket);
+    process.exit();
+	});
+
+	socket.on('error', function() {
+		console.log('\n\n* Session terminated by other party *');
+		stop(socket);
+	})
+
 });
 
 function emit(socket, data) {
