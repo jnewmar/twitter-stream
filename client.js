@@ -25,3 +25,7 @@ socket.on('end', function(data){
 	console.log('Recieved-count: \t', counter);
 	console.log('Frequency: \t\t', (counter/(end/1000)).toFixed(0), 't/s');
 });
+
+socket.on('error', function(err){
+	console.log(err);
+});
