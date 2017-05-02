@@ -106,6 +106,7 @@ function stop(socket) {
 	timer.clearInterval();
 	socket.destroy()
 	stream.close();
+	server.close();
 	var endTime = new Date() - startTime;
 	console.log("\n|");
 	console.log('End-memory: \t', (process.memoryUsage().rss/(1024*1024)).toFixed(1), 'MB');
