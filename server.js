@@ -83,9 +83,7 @@ let server = net.createServer(function(socket){
 	timer.setInterval(function() {
 		if (buffer.length < TPS && endOfFile) {
 			emit(socket, buffer); // emit rest of buffer
-			setTimeout(function() { // give the socket time to write before closing
-				stop(socket);
-			}, 100);
+			stop(socket);
 		} else {
 			if (buffer.length < (TPS*BUFFER_THRESHOLD) && !endOfFile) {
 				stream.resume();
@@ -113,6 +111,7 @@ function emit(socket, data) {
 		stop(socket);
 	} else {
 		for (index in data) {
+			//console.log(data[index]);
 			socket.write(data[index] + '\r\n', function(){
 				counter++;
 			});
@@ -122,10 +121,10 @@ function emit(socket, data) {
 
 function stop(socket) {
 	timer.clearInterval();
-	logTimer.clearInterval();
-	socket.destroy()
+	//logTimer.clearInterval();
+	//socket.destroy();
+	//server.close();
 	stream.close();
-	server.close();
 	var endTime = new Date() - startTime;
 	console.log("\n|");
 	console.log('End-memory: \t', (process.memoryUsage().rss/(1024*1024)).toFixed(1), 'MB');
@@ -134,4 +133,4 @@ function stop(socket) {
 	console.log('Frequency: \t', (counter/(endTime/1000)).toFixed(0), 't/s')
 }
 
-server.listen(PORT, 'localhost');
+server.listen(PORT, '0.0.0.0');
