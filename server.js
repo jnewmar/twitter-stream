@@ -5,6 +5,7 @@ const readline = require('readline');
 const fs = require('fs');
 const process = require('process');
 const net = require('net');
+const os = require('os');
 
 // CONFIG
 const TPS = 5000; // int
@@ -16,6 +17,7 @@ const PORT = 9999;
 
 var counter = 0;
 var timer = new nanoTimer();
+var logTimer = new nanoTimer();
 var startTime;
 var buffer = [];
 var loadCount = 0;
@@ -27,6 +29,21 @@ console.log('Tweets/s: \t', TPS);
 console.log('Repeat: \t', REPEAT);
 console.log('Cutoff: \t', CUTOFF);
 console.log('Buffer thrs.: \t', BUFFER_THRESHOLD);
+
+function logResourceUsage() {
+	if (!startTime) {return;}
+	var time = ((new Date() - startTime)/1000);
+	var memory = (process.memoryUsage().rss/(1024*1024));
+	var memoryPercentage = ((memory/(os.totalmem()/(1024*1024)))*100).toFixed(1);
+	var cpuTime = (process.cpuUsage().user/1000000);
+	var cpuPercentage = ((cpuTime/time)*100).toFixed(1);
+	var logLine = time.toFixed(1) + ',\t' + memory.toFixed(1) + ',\t' + cpuTime.toFixed(1) + ',\t' + memoryPercentage + ',\t' + cpuPercentage + '\n';
+	fs.appendFile("resource.log", logLine);
+}
+fs.writeFile('resource.log', 'TIME,\t(MB),\t(s),\tMEM(%),\tCPU(%)\n');
+logTimer.setInterval(function(){
+	logResourceUsage();
+}, [logTimer], '2s');
 
 function createNewInputStream() {
 	process.stdout.write("|");
@@ -104,6 +121,7 @@ function emit(socket, data) {
 
 function stop(socket) {
 	timer.clearInterval();
+	logTimer.clearInterval();
 	socket.destroy()
 	stream.close();
 	server.close();
