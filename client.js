@@ -3,7 +3,10 @@
 const net = require('net');
 const socket = net.Socket();
 
-socket.connect(9999, '127.0.0.1', function() {
+// CONFIG
+const CONFIG = require('./config.js');
+
+socket.connect(CONFIG.PORT, CONFIG.HOST, function() {
 	console.log('Connected');
 });
 

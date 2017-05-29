@@ -8,12 +8,13 @@ const net = require('net');
 const os = require('os');
 
 // CONFIG
-const TPS = 5000; // int
-const REPEAT = false; // true | false
-const CUTOFF = null; // int | null
-const BUFFER_THRESHOLD = 10; // int
-const DATAFILE = 'sample.txt';
-const PORT = 9999;
+const CONFIG = require('./config.js');
+const TPS = CONFIG.TPS;
+const REPEAT = CONFIG.REPEAT;
+const CUTOFF = CONFIG.CUTOFF;
+const BUFFER_THRESHOLD = CONFIG.BUFFER_THRESHOLD;
+const DATAFILE = CONFIG.DATAFILE;
+const PORT = CONFIG.PORT;
 
 var counter = 0;
 var timer = new nanoTimer();
