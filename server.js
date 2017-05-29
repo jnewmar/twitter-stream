@@ -39,9 +39,17 @@ function logResourceUsage() {
 	var cpuTime = (process.cpuUsage().user/1000000);
 	var cpuPercentage = ((cpuTime/time)*100).toFixed(1);
 	var logLine = time.toFixed(1) + ',\t' + memory.toFixed(1) + ',\t' + cpuTime.toFixed(1) + ',\t' + memoryPercentage + ',\t' + cpuPercentage + '\n';
-	fs.appendFile("resource.log", logLine);
+	fs.appendFile("resource.log", logLine, function(err) {
+		if (err) {
+			console.log(err);
+		}
+	});
 }
-fs.writeFile('resource.log', 'TIME,\t(MB),\t(s),\tMEM(%),\tCPU(%)\n');
+fs.writeFile('resource.log', 'TIME,\t(MB),\t(s),\tMEM(%),\tCPU(%)\n', function(err) {
+	if (err) {
+		console.log(err);
+	}
+});
 logTimer.setInterval(function(){
 	logResourceUsage();
 }, [logTimer], '2s');
