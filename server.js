@@ -9,12 +9,14 @@ const os = require('os');
 
 // CONFIG
 const CONFIG = require('./config.js');
+const { faker } = require('@faker-js/faker');
 const TPS = CONFIG.TPS;
 const REPEAT = CONFIG.REPEAT;
 const CUTOFF = CONFIG.CUTOFF;
 const BUFFER_THRESHOLD = CONFIG.BUFFER_THRESHOLD;
 const DATAFILE = CONFIG.DATAFILE;
 const PORT = CONFIG.PORT;
+
 
 var counter = 0;
 var timer = new nanoTimer();
@@ -120,7 +122,20 @@ function emit(socket, data) {
 	} else {
 		for (index in data) {
 			//console.log(data[index]);
-			socket.write(data[index] + '\r\n', function(){
+
+			let message = data[index];
+			let random_number = Math.floor(Math.random() * 100) + 1;
+			if (random_number <= parseInt(CONFIG.HASHTAG_RATE)) {
+				message = message + ' ' + CONFIG.HASHTAG;
+			}
+			const now = new Date();
+			let tweet = {
+				id: faker.string.uuid(),
+				author_id: faker.internet.userName(),
+				created_at: now.getTime(),
+				text: message
+			}
+			socket.write(JSON.stringify(tweet) + '\r\n', function(){
 				counter++;
 			});
 		}

@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/thormartin91/twitter-stream#readme",
   "dependencies": {
+    "@faker-js/faker": "^8.4.1",
     "fs": "0.0.1-security",
     "nanotimer": "^0.3.14",
     "process": "^0.11.9",
